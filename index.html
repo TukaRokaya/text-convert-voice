@@ -65,26 +65,60 @@
     <div class="mb-3">
       <textarea id="textInput" class="form-control" rows="6" placeholder="Type something here..."></textarea>
     </div>
-    <button onclick="speakText()" class="btn btn-primary w-100">🔊 Speak</button>
+    <button onclick="speakText()" class="btn btn-primary w-100 mb-3">🔊 Speak</button>
+    <button onclick="stopSpeech()" class="btn btn-danger w-100">⛔ Stop</button>
   </div>
 
   <!-- About and Contact -->
   <footer class="mt-4">
     <p id="about"><strong>About Us:</strong> This tool converts your text into speech using your browser's voice engine.</p>
-    <p><strong>Contact Number:</strong> 00000</p>
   </footer>
 
   <script>
+    let currentUtterance = null; // To keep track of current speech
+
     function speakText() {
       const text = document.getElementById("textInput").value;
       if (text.trim() === "") {
-        alert("Please type some text first!");
+        alert("कृपया केही टेक्स्ट लेख्नुहोस्!");
         return;
       }
+
+      // Create a SpeechSynthesisUtterance object
       const utterance = new SpeechSynthesisUtterance(text);
-      speechSynthesis.speak(utterance);
+
+      // Set language to Nepali (ensure the browser supports Nepali language)
+      utterance.lang = "ne-NP"; 
+
+      // Optional: Set volume, pitch, and rate
+      utterance.volume = 1; // 0 to 1
+      utterance.rate = 1; // 0.1 to 10 (default is 1)
+      utterance.pitch = 1; // 0 to 2 (default is 1)
+
+      // Check if SpeechSynthesis is supported
+      if ('speechSynthesis' in window) {
+        // Cancel any ongoing speech first (if any)
+        if (currentUtterance) {
+          speechSynthesis.cancel(); 
+        }
+
+        // Assign the utterance to the global variable
+        currentUtterance = utterance;
+        speechSynthesis.speak(utterance);
+      } else {
+        alert("Sorry, your browser does not support SpeechSynthesis API.");
+      }
+    }
+
+    // Function to stop the speech
+    function stopSpeech() {
+      if (currentUtterance) {
+        speechSynthesis.cancel(); // Stop the current speech
+        currentUtterance = null;  // Clear the current utterance
+      }
     }
   </script>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
